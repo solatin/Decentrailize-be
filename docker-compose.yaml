@@ -1,0 +1,10 @@
+version: '3'
+services:
+  be:
+    image: solatin/decentralized-server:1-lts-alpine
+    ports:
+      - 8080:8080
+    volumes:
+      - storage:/app/storage
+volumes:
+  storage:
