@@ -76,9 +76,28 @@ app.get('/download', (req, res) => {
 	}
 });
 
+app.delete('/delete', (req, res) => {
+	const hash = req.query.hash;
+	const folder = hash.slice(-1).charCodeAt(0) % CONFIG.ORIGINAL_NUMS_OF_FILES;
+	if (!CONFIG.FILES_TO_STORE.includes(folder)) {
+		res.status(400).send({ message: 'Not my job' });
+	}
+	const fileName = req.query.fileName;
+	const path = __dirname + '/storage/' + folder + '/' + fileName;
+	if (fs.existsSync(path)) {
+		fs.unlinkSync(path)
+		res.end()
+	} else {
+		res.status(400).json({ message: 'No file found' });
+	}
+});
+
 const host = '0.0.0.0';
-const port = CONFIG.PORT || 8080;
+// for local test only
+// const port = CONFIG.PORT || 8080;
+
+const port = 8080;
 
 app.listen(port, host, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Server 1 listening at port: ${port}`);
 });

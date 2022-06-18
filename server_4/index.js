@@ -77,8 +77,9 @@ app.get('/download', (req, res) => {
 });
 
 const host = '0.0.0.0';
-const port = CONFIG.PORT || 8080;
+// const port = CONFIG.PORT || 8080;
+const port = 8080;
 
 app.listen(port, host, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Server 4 listening at port:${port}`);
 });
