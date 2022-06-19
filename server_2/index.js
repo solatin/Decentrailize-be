@@ -1,5 +1,6 @@
 const fs = require('fs');
 const express = require('express');
+const requestIp = require('request-ip');
 const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
@@ -62,6 +63,7 @@ app.post('/upload', function (req, res) {
 });
 
 app.get('/download', (req, res) => {
+	console.log('zo')
 	const hash = req.query.hash;
 	const folder = hash.slice(-1).charCodeAt(0) % CONFIG.ORIGINAL_NUMS_OF_FILES;
 	if (!CONFIG.FILES_TO_STORE.includes(folder)) {
@@ -76,9 +78,14 @@ app.get('/download', (req, res) => {
 	}
 });
 
+app.get('/get-files', (req, res) => {
+	const clientIp = requestIp.getClientIp(req); 
+	console.log('request from', clientIp)
+	res.end()
+})
 const host = '0.0.0.0';
 // const port = CONFIG.PORT || 8080;
-const port = 8080;
+const port = 3002;
 app.listen(port, host, () => {
   console.log(`Server 2 listening at port:${port}`);
 });

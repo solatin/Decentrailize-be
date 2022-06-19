@@ -1,48 +1,26 @@
 const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const multer = require('multer');
+require('./firebase/firebaseInit');
 require('dotenv').config();
-
+const { uploadSingleFile, uploadArrayFile } = require('./utils/multer');
 const CONFIG = require('./config');
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded());
 
+
 app.use(cors());
 
-const storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-    const path = `./storage/${req.folder}`
-		if (!fs.existsSync(path)) {
-			fs.mkdir(path, function (err) {
-				console.log('Failed to create directory', err);
-			});
+app.post('/internal/upload', function (req, res) {
+	uploadArrayFile(req, res, function (err) {
+		if (err) {
+			return res.status(400).send({ message: err.message });
 		}
-		cb(null, path);
-	},
-	filename: function (req, file, cb) {
-		cb(null, req.body.hash + path.extname(file.originalname)); // not work if file does not have extension, then use mine type
-	}
-});
-
-const upload = multer({
-	storage: storage,
-	fileFilter: (req, file, cb) => {
-		const hash = req.body.hash;
-		const folder = hash.slice(-1).charCodeAt(0) % CONFIG.ORIGINAL_NUMS_OF_FILES;
-		if (CONFIG.FILES_TO_STORE.includes(folder)) {
-			req.folder = folder;
-			cb(null, true);
-		} else {
-			cb(new Error('Not my job'));
-		}
-	}
-});
-
-const uploadSingleFile = upload.single('file');
+		res.end()
+	})
+})
 
 app.post('/upload', function (req, res) {
 	uploadSingleFile(req, res, function (err) {
@@ -62,6 +40,7 @@ app.post('/upload', function (req, res) {
 });
 
 app.get('/download', (req, res) => {
+	console.log('zo')
 	const hash = req.query.hash;
 	const folder = hash.slice(-1).charCodeAt(0) % CONFIG.ORIGINAL_NUMS_OF_FILES;
 	if (!CONFIG.FILES_TO_STORE.includes(folder)) {
@@ -92,11 +71,12 @@ app.delete('/delete', (req, res) => {
 	}
 });
 
+
 const host = '0.0.0.0';
 // for local test only
-// const port = CONFIG.PORT || 8080;
+const port = CONFIG.PORT || 8080;
 
-const port = 8080;
+// const port = 8080;
 
 app.listen(port, host, () => {
   console.log(`Server 1 listening at port: ${port}`);
