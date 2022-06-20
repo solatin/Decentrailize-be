@@ -16,11 +16,9 @@
     "dotenv": "^16.0.1",
     "express": "^4.17.3",
     "firebase": "^9.8.3",
-    "firebase-admin": "^11.0.0",
-    "ip": "^1.1.8",
     "moment": "^2.29.2",
     "multer": "^1.4.4",
     "nodemon": "^2.0.16",
-    "public-ip": "^6.0.0"
+    "request-ip": "^2.2.0"
   }
 }
