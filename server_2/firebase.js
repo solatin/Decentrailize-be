@@ -4,6 +4,7 @@ const { default: axios } = require('axios');
 const http = require('http');
 const fs = require('fs');
 const config = require('./config');
+const Ref = require('./utils/ref')
 const firebaseConfig = {
 	apiKey: 'AIzaSyABTUCPHL-_3dCay_GdlMEHHSgZB5013hM',
 	authDomain: 'mobile-thesis.firebaseapp.com',
@@ -17,6 +18,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const dbRef = ref(getDatabase(app));
 
+const listURLInLocationRef = Ref.getInstance();
+
 get(child(dbRef, 'servers'))
 	.then(async (snapshot) => {
 		if (snapshot.exists()) {
@@ -29,8 +32,8 @@ get(child(dbRef, 'servers'))
 					const ownServerIdx = arrayVal.findIndex((i) => i.url === `http://${ownIP}:9080`);
 					const [ownServer] = arrayVal.splice(ownServerIdx, 1);
 					const ownLocation = ownServer.location;
-					const listURLInLocation = arrayVal.filter((val) => val.location === ownLocation).map((val) => val.url);
-
+					listURLInLocationRef.setValue(arrayVal.filter((val) => val.location === ownLocation).map((val) => val.url));
+					const listURLInLocation = listURLInLocationRef.getValue();
 					console.log('List server in location: ', listURLInLocation);
 					console.log('My own ip: ', ownIP);
 
@@ -41,7 +44,7 @@ get(child(dbRef, 'servers'))
 							})
 							.then((res) => {
 								const { data } = res;
-								console.log('Request get file to server: ', url, 'and return', data);
+								console.log('[Internal] Request get file to server: ', url, 'and return', data);
 
 								data.map((file) => {
 									if (!fs.existsSync(file.path)) {
@@ -53,7 +56,7 @@ get(child(dbRef, 'servers'))
 								});
 								
 							})
-							.catch(() => console.log('Request get file to server', url, 'failed'));
+							.catch(() => console.log('[Internal] Request get file to server', url, 'failed'));
 					});
 				});
 			});
@@ -64,3 +67,4 @@ get(child(dbRef, 'servers'))
 	.catch((error) => {
 		console.error(error);
 	});
+

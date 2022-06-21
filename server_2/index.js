@@ -5,12 +5,12 @@ const requestIp = require('request-ip')
 require('./firebase');
 require('dotenv').config();
 const { uploadSingleFile, uploadArrayFile } = require('./utils/multer');
+const Ref = require('./utils/ref')
 const CONFIG = require('./config');
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded());
-
 
 app.use(cors());
 
@@ -69,10 +69,13 @@ app.delete('/delete', (req, res) => {
 
 app.post('/internal/get-files', (req, res) => {
 	const clientIp = requestIp.getClientIp(req);
-	// if (!listURLInLocation.includes(clientIp)) {
-	// 	res.end();
-	// 	return;
-	// }
+	const listURLInLocationRef = Ref.getInstance();
+	const listURLInLocation = listURLInLocationRef.getValue();
+	if (!listURLInLocation.includes(`http://${clientIp}:9080`)) {
+		console.log('[Internal] Request get file from not allowed IP:', clientIp);
+		res.end();
+		return;
+	}
 	const listFolder = req.body.listFolder;
 	const listFolderReturn = fs
 		.readdirSync('./storage')
@@ -88,7 +91,7 @@ app.post('/internal/get-files', (req, res) => {
 			});
 		});
 	});
-	console.log('Request from server: ', clientIp, 'and return', listFileReturn);
+	console.log('[Internal] Request get file from server: ', clientIp, 'and return', listFileReturn);
 
 	res.send(listFileReturn);
 });
