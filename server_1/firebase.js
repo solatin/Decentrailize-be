@@ -1,5 +1,5 @@
-const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, get, child } = require('firebase/database');
+const { initializeApp } = require('@firebase/app');
+const { getDatabase, ref, get, child, set } = require('@firebase/database');
 const { default: axios } = require('axios');
 const http = require('http');
 const fs = require('fs');

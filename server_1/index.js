@@ -103,6 +103,7 @@ const host = '0.0.0.0';
 
 const port = 8080;
 
+
 app.listen(port, host, () => {
-  console.log(`Server 2 listening at port: ${port}`);
+  console.log(`Server 1 listening at port: ${port}`);
 });
